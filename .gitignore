@@ -17,3 +17,5 @@ yarn-error.log*
 !package-lock.json
 !models.json
 !models_list.json
+!vercel.json
+!frontend/vercel.json
