@@ -120,7 +120,7 @@ export default function DocsModal({ isOpen, onClose }) {
                       <span className="text-[10px] text-muted">Standard Native API</span>
                     </div>
                     <button 
-                      onClick={() => navigator.clipboard.writeText("fetch('https://mockifyai.dev/api/user/endpoint')\n  .then(res => res.json())\n  .then(data => console.log(data));")}
+                      onClick={() => navigator.clipboard.writeText(`fetch('${window.location.origin}/api/user/endpoint')\n  .then(res => res.json())\n  .then(data => console.log(data));`)}
                       className="text-[10px] font-mono hover:text-acid transition-colors"
                     >
                       COPY

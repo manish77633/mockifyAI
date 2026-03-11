@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
-const API_BASE = 'http://localhost:5000/api'
+let API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+if (window.location.hostname !== 'localhost' && API_BASE.includes('localhost')) {
+  API_BASE = '/api';
+}
 const FEATURES_FREE = [
   '10 Endpoints',
   '1 MB payload limit',
