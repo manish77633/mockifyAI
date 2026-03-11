@@ -147,33 +147,37 @@ export default function Dashboard() {
               <h1 className="font-display font-bold text-xl text-bright">Dashboard</h1>
               <p className="text-xs text-muted mt-0.5">Build mock APIs in seconds</p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1 sm:gap-3">
               <button 
                 onClick={toggleTheme}
-                className="p-2 rounded-lg text-dim hover:text-acid hover:bg-acid/10 transition-all border border-transparent hover:border-acid/20"
+                className="p-1.5 sm:p-2 rounded-lg text-dim hover:text-acid hover:bg-acid/10 transition-all border border-transparent hover:border-acid/20"
                 title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
               >
                 {theme === 'dark' ? SUN_SVG : MOON_SVG}
               </button>
               <button 
                 onClick={() => setIsDocsOpen(true)}
-                className="btn-ghost hidden sm:flex items-center gap-1.5"
+                className="btn-ghost flex items-center gap-1.5 px-1.5 sm:px-3"
+                title="Docs"
               >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 16 16" fill="none">
+                <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
                   <path d="M2 3h12M2 8h8M2 13h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
-                Docs
+                <span className="hidden sm:inline">Docs</span>
               </button>
               <Link to="/pricing"
-                className="btn-ghost hidden sm:flex items-center gap-1.5 text-warn/80 border-warn/20 hover:border-warn/40 hover:text-warn"
+                className="btn-ghost flex items-center gap-1.5 text-warn/80 border-warn/20 hover:border-warn/40 hover:text-warn px-1.5 sm:px-3"
+                title="Upgrade"
               >
-                ⚡ {user?.isPro ? 'Pro ✓' : 'Upgrade'}
+                ⚡ <span className="hidden sm:inline">{user?.isPro ? 'Pro ✓' : 'Upgrade'}</span>
               </Link>
               <button 
                 onClick={logout}
-                className="text-xs font-medium text-dim hover:text-danger hover:bg-danger/10 px-3 py-2 rounded-lg transition-all border border-transparent hover:border-danger/20"
+                className="text-xs font-medium text-dim hover:text-danger hover:bg-danger/10 px-2 sm:px-3 py-2 rounded-lg transition-all border border-transparent hover:border-danger/20"
+                title="Sign Out"
               >
-                Sign Out
+                <span className="hidden sm:inline">Sign Out</span>
+                <span className="sm:hidden text-[10px] uppercase">Exit</span>
               </button>
             </div>
           </header>
