@@ -61,6 +61,16 @@ app.use('/api/payment',   require('./routes/paymentRoutes'));
 app.use('/api/endpoints', require('./routes/apiRoutes'));          // management CRUD
 app.use('/api',           mockFetchLimiter, require('./routes/apiRoutes')); // public wildcard
 
+// ─── Serve Frontend in Production ─────────────────────────────────────────────
+const path = require('path');
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.get('*', (req, res, next) => {
+    if (req.originalUrl.startsWith('/api')) return next();
+    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  });
+}
+
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) =>
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
