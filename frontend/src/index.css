@@ -1,0 +1,153 @@
+:root {
+  /* Dark mode (default) */
+  --bg-color: #080A0F;
+  --surface-color: #141820;
+  --panel-color: #0E1117;
+  --text-main: #E2E8F0;
+  --text-dim: #94A3B8;
+  --text-muted: #64748B;
+  --border-color: #1E2433;
+  --acid: #00FF88;
+  --acid-dim: #00CC6A;
+  --void: #000000;
+  --subtle: rgba(255, 255, 255, 0.05);
+  --grid-color: rgba(30, 36, 51, 0.4);
+}
+
+.light-mode {
+  --bg-color: #F8FAFC;
+  --surface-color: #FFFFFF;
+  --panel-color: #F1F5F9;
+  --text-main: #1E293B;
+  --text-dim: #475569;
+  --text-muted: #64748B;
+  --border-color: #E2E8F0;
+  --acid: #00B35D; /* Slightly darker green for light bg */
+  --acid-dim: #008C4A;
+  --void: #FFFFFF;
+  --subtle: rgba(0, 0, 0, 0.05);
+  --grid-color: rgba(200, 200, 200, 0.2);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html, body, #root {
+    height: 100%;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-color); }
+  ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+  /* Selection */
+  ::selection { background: rgba(0, 255, 136, 0.2); color: inherit; }
+}
+
+@layer components {
+  .tab-active {
+    @apply border-b-2;
+    color: var(--acid);
+    border-color: var(--acid);
+  }
+  .tab-inactive {
+    @apply border-b-2 border-transparent;
+    color: var(--text-dim);
+  }
+  .tab-inactive:hover {
+    color: var(--text-main);
+    border-color: var(--text-muted);
+  }
+
+  .btn-primary {
+    background-color: var(--acid);
+    color: #080A0F; /* Keep dark text on bright green buttons */
+    @apply font-display font-semibold px-6 py-2.5 rounded-lg
+           active:scale-95 transition-all duration-150
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+  .btn-primary:hover {
+    background-color: var(--acid-dim);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border-color);
+    @apply px-4 py-2 rounded-lg transition-all duration-150 text-sm;
+  }
+  .btn-ghost:hover {
+    color: var(--text-main);
+    border-color: var(--text-muted);
+  }
+
+  .input-base {
+    @apply w-full rounded-xl px-4 py-3 transition-all duration-150 font-body text-sm;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+  }
+  .input-base:focus {
+    @apply outline-none ring-1;
+    border-color: var(--acid);
+    --tw-ring-color: rgba(0, 255, 136, 0.3);
+  }
+  .input-base::placeholder {
+    color: var(--text-muted);
+  }
+
+  .card {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    @apply rounded-2xl shadow-sm;
+  }
+}
+
+/* Noise texture overlay */
+.noise-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* Grid background pattern */
+.grid-bg {
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Override utility colors for light mode */
+.light-mode .bg-void { background-color: var(--bg-color); }
+.light-mode .bg-surface { background-color: var(--surface-color); }
+.light-mode .bg-panel { background-color: var(--panel-color); }
+.light-mode .text-text { color: var(--text-main); }
+.light-mode .text-dim { color: var(--text-dim); }
+.light-mode .text-muted { color: var(--text-muted); }
+.light-mode .border-border { border-color: var(--border-color); }
+.light-mode .bg-subtle { background-color: var(--subtle); }
