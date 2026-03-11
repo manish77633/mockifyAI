@@ -1,7 +1,13 @@
 import axios from 'axios'
 
+let baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Force relative path if deployed to production to avoid localhost bleed
+if (window.location.hostname !== 'localhost' && baseURL.includes('localhost')) {
+  baseURL = '/api';
+}
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  baseURL,
   timeout: 30_000,
   headers: { 'Content-Type': 'application/json' },
 })
