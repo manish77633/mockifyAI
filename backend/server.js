@@ -10,7 +10,18 @@ const app = express();
 
 // ─── Security & Logging ───────────────────────────────────────────────────────
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*', credentials: true }));
+app.use(cors({
+  origin: (origin, callback) => {
+    // List of allowed origins
+    const allowed = [process.env.CLIENT_ORIGIN, 'http://localhost:3000'].filter(Boolean);
+    if (!origin || allowed.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.set('trust proxy', 1);
 
