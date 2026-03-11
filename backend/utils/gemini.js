@@ -1,5 +1,7 @@
-const GEMINI_API_URL =
+const GEMINI_API_URL_PRIMARY =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+const GEMINI_API_URL_FALLBACK =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 const TIMEOUT_MS = parseInt(process.env.GEMINI_TIMEOUT_MS, 10) || 30_000;
 
@@ -37,7 +39,7 @@ async function generateMockData(userPrompt) {
 
   let response;
   try {
-    response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    response = await fetch(`${GEMINI_API_URL_PRIMARY}?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       signal: controller.signal,
@@ -49,6 +51,23 @@ async function generateMockData(userPrompt) {
         },
       }),
     });
+
+    if (!response.ok && response.status === 503) {
+      console.warn(`[Gemini API] Primary model 503, falling back to 1.5-flash`);
+      response = await fetch(`${GEMINI_API_URL_FALLBACK}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: buildPrompt(userPrompt) }] }],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          },
+        }),
+      });
+    }
+
   } catch (err) {
     if (err.name === 'AbortError') {
       const timeoutErr = new Error(
