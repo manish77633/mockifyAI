@@ -22,7 +22,9 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
+  skip: (req) => req.url === '/health'
+}));
 app.set('trust proxy', 1);
 
 // ─── Rate Limiters ────────────────────────────────────────────────────────────
@@ -61,6 +63,10 @@ app.use('/api/payment',   require('./routes/paymentRoutes'));
 app.use('/api/endpoints', require('./routes/apiRoutes'));          // management CRUD
 app.use('/api',           mockFetchLimiter, require('./routes/apiRoutes')); // public wildcard
 
+app.get('/health', (_req, res) =>
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+);
+
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 const path = require('path');
 if (process.env.NODE_ENV === 'production') {
@@ -72,9 +78,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
-app.get('/health', (_req, res) =>
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-);
+
 
 // ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use((_req, res) =>
