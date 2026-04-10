@@ -2,11 +2,9 @@ import { createContext, useContext, useState, useEffect, useCallback, useMemo } 
 
 const AuthContext = createContext(null);
 
-let API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-if (window.location.hostname !== 'localhost' && API_BASE_URL.includes('localhost')) {
-  API_BASE_URL = '/api';
-}
+// VITE_API_URL must be set to your Render backend URL in Vercel environment variables
+// e.g. https://your-app.onrender.com/api
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

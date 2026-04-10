@@ -1,9 +1,9 @@
 require('dotenv').config();
-const express   = require('express');
-const mongoose  = require('mongoose');
-const cors      = require('cors');
-const helmet    = require('helmet');
-const morgan    = require('morgan');
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -64,26 +64,26 @@ app.get('/health', (_req, res) =>
 );
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-app.use('/api/auth',      require('./routes/auth'));
-app.use('/api/users',     require('./routes/users'));
-app.use('/api/payment',   require('./routes/paymentRoutes'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/payment', require('./routes/paymentRoutes'));
 
 // Management CRUD (Yahan limiter nahi chahiye ya alag chahiye)
-app.use('/api/endpoints', require('./routes/apiRoutes')); 
+app.use('/api/endpoints', require('./routes/apiRoutes'));
 
 // Public Mock Serve (Ispe limiter zaroori hai)
 // Isko hamesha endpoints ke BAAD rakho taaki specific routes pehle match ho jayein
-app.use('/api', mockFetchLimiter, require('./routes/apiRoutes')); 
+app.use('/api', mockFetchLimiter, require('./routes/apiRoutes'));
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 const path = require('path');
 if (process.env.NODE_ENV === 'production') {
   // Static files pehle serve karo
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  
+
   // Catch-all route
   app.get('*', (req, res, next) => {
-    // Agar request /api se start ho rahi hai aur yahan tak pahuchi hai, 
+    // Agar request /api se start ho rahi hai aur yahan tak pahuchi hai,
     // iska matlab wo API exist nahi karti. Toh seedha 404 do, HTML nahi.
     if (req.originalUrl.startsWith('/api')) {
       return next(); // Ye niche wale 404 handler pe bhej dega
@@ -102,7 +102,7 @@ app.use((_req, res) =>
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   console.error('[GlobalError]', err);
-  const status  = err.status || err.statusCode || 500;
+  const status = err.status || err.statusCode || 500;
   const message =
     process.env.NODE_ENV === 'production' && status === 500
       ? 'Internal server error.'
@@ -111,7 +111,7 @@ app.use((err, _req, res, _next) => {
 });
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
-const PORT      = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
 if (!MONGO_URI) { console.error('FATAL: MONGO_URI not set.'); process.exit(1); }
