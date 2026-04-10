@@ -56,6 +56,9 @@ const mockFetchLimiter = rateLimit({
 app.use(express.json({ limit: '11mb' }));
 app.use(express.urlencoded({ extended: true, limit: '32kb' }));
 
+// ... upar ka saara code same hai ...
+
+// ─── Health Check (Sabse upar rakho taaki logs clean rahein) ──────────────────
 app.get('/health', (_req, res) =>
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 );
@@ -64,28 +67,36 @@ app.get('/health', (_req, res) =>
 app.use('/api/auth',      require('./routes/auth'));
 app.use('/api/users',     require('./routes/users'));
 app.use('/api/payment',   require('./routes/paymentRoutes'));
-app.use('/api/endpoints', require('./routes/apiRoutes'));          // management CRUD
-app.use('/api',           mockFetchLimiter, require('./routes/apiRoutes')); // public wildcard
 
+// Management CRUD (Yahan limiter nahi chahiye ya alag chahiye)
+app.use('/api/endpoints', require('./routes/apiRoutes')); 
 
+// Public Mock Serve (Ispe limiter zaroori hai)
+// Isko hamesha endpoints ke BAAD rakho taaki specific routes pehle match ho jayein
+app.use('/api', mockFetchLimiter, require('./routes/apiRoutes')); 
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 const path = require('path');
 if (process.env.NODE_ENV === 'production') {
+  // Static files pehle serve karo
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  
+  // Catch-all route
   app.get('*', (req, res, next) => {
-    if (req.originalUrl.startsWith('/api')) return next();
+    // Agar request /api se start ho rahi hai aur yahan tak pahuchi hai, 
+    // iska matlab wo API exist nahi karti. Toh seedha 404 do, HTML nahi.
+    if (req.originalUrl.startsWith('/api')) {
+      return next(); // Ye niche wale 404 handler pe bhej dega
+    }
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
 }
 
-// ─── Health Check ─────────────────────────────────────────────────────────────
-
-
-// ─── 404 ──────────────────────────────────────────────────────────────────────
+// ─── 404 & Error Handlers (Same as your code) ─────────────────────────────────
 app.use((_req, res) =>
   res.status(404).json({ success: false, message: 'Route not found.' })
 );
+// ... baaki boot logic same hai ...
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
 // eslint-disable-next-line no-unused-vars
