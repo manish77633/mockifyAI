@@ -1,9 +1,11 @@
 import axios from 'axios'
 
-// In production (Vercel), VITE_API_URL must be set to your Render backend URL
-// e.g. https://your-app.onrender.com/api
-// Never use relative /api in production — frontend (Vercel) & backend (Render) are on different domains
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+let rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+if (rawApiUrl && !rawApiUrl.endsWith('/api')) {
+  if (rawApiUrl.endsWith('/')) rawApiUrl += 'api';
+  else rawApiUrl += '/api';
+}
+const baseURL = rawApiUrl;
 const api = axios.create({
   baseURL,
   timeout: 30_000,
