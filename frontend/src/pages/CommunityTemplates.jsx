@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Search, Copy, CheckCircle2 } from 'lucide-react'
+import { Search, Copy, CheckCircle2, ArrowUpRight, Box } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useAuth } from '../hooks/useAuth'
 
 const TEMPLATES = [
   { id: 1, title: 'E-Commerce Products', category: 'Store', code: `[\n  {\n    "id": 1,\n    "name": "Wireless Headphones",\n    "price": 99.99,\n    "stock": 45,\n    "category": "Electronics"\n  }\n]` },
@@ -12,6 +13,7 @@ const TEMPLATES = [
 ]
 
 export default function CommunityTemplates() {
+  const { user } = useAuth()
   const [copiedId, setCopiedId] = useState(null)
   const [search, setSearch] = useState('')
 
@@ -24,57 +26,95 @@ export default function CommunityTemplates() {
   const filtered = TEMPLATES.filter(t => t.title.toLowerCase().includes(search.toLowerCase()) || t.category.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h2 className="font-display font-bold text-3xl text-text mb-2 tracking-tight">Community Templates</h2>
-          <p className="text-dim text-base">Kickstart your mock API with these pre-built JSON schemas.</p>
+    <div className="max-w-6xl mx-auto py-12">
+      
+      {/* Precision Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8 px-4">
+        <div className="max-w-2xl px-2">
+          <motion.div 
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-2 text-accent mb-4"
+          >
+            <Box size={18} fill="currentColor" className="opacity-40" />
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.4em]">Resource Blueprints</span>
+          </motion.div>
+          <h2 className="font-display font-black text-5xl md:text-6xl text-text tracking-tighter mb-6 leading-[0.9]">
+            Industrial <span className="text-accent">Schemas.</span>
+          </h2>
+          <p className="text-dim text-lg font-medium leading-relaxed max-w-xl">
+            Pre-built JSON architectures for high-frequency load testing and reliable frontend integration.
+          </p>
         </div>
-        <div className="relative w-full md:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+
+        <div className="relative w-full md:w-80 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-accent transition-colors" size={18} />
           <input 
             type="text" 
-            placeholder="Search templates..." 
+            placeholder="Search resources..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="input-base pl-10 bg-surface border-border focus:border-acid"
+            className="input-base pl-12 h-12 bg-white/5 border-border focus:border-accent shadow-xl font-bold"
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Glass Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
         {filtered.map((tpl, i) => (
           <motion.div 
             initial={{ opacity: 0, y: 15 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ delay: i * 0.05 }}
+            transition={{ delay: i * 0.05, duration: 0.5 }}
             key={tpl.id} 
-            className="card bg-panel border-border overflow-hidden flex flex-col group"
+            className="glass glass-hover p-1 rounded-[2rem] flex flex-col group h-full"
           >
-            <div className="p-4 border-b border-border flex items-center justify-between bg-surface/50">
-              <h3 className="font-display font-semibold text-text">{tpl.title}</h3>
-              <span className="text-[10px] uppercase tracking-wider px-2 py-1 bg-acid/10 text-acid rounded border border-acid/20">{tpl.category}</span>
+            <div className="p-6 pb-2">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black uppercase tracking-widest text-accent bg-accent/10 px-3 py-1 rounded-full border border-accent/20">
+                  {tpl.category}
+                </span>
+                <ArrowUpRight size={18} className="text-muted group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              </div>
+              <h3 className="font-display font-black text-2xl text-text tracking-tighter leading-snug">
+                {tpl.title}
+              </h3>
             </div>
-            <div className="p-4 flex-1 bg-[#0A0A0A] relative">
-              <pre className="text-xs text-slate-300 font-mono leading-relaxed overflow-hidden">
-                {tpl.code}
-              </pre>
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] to-transparent pointer-events-none" />
+
+            <div className="p-6 flex-1 flex flex-col">
+              <div className="grow rounded-2xl bg-panel border border-border/10 p-5 relative overflow-hidden group-hover:border-accent/10 transition-colors">
+                <pre className="text-[11px] text-dim font-mono leading-relaxed overflow-hidden group-hover:text-text transition-colors">
+                  {tpl.code}
+                </pre>
+                <div className="absolute inset-0 bg-gradient-to-t from-void/10 to-transparent pointer-events-none opacity-40" />
+              </div>
             </div>
-            <div className="p-4 border-t border-border bg-surface flex justify-between items-center">
-              <span className="text-xs text-muted">Ready to deploy</span>
+
+            <div className="p-6 pt-2 flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+              <span className="text-muted">Edge Ready</span>
               <button 
                 onClick={() => handleCopy(tpl.id, tpl.code)}
-                className="btn-ghost flex items-center gap-1.5 py-1.5 px-3 text-xs"
+                className={`flex items-center gap-2 py-2 px-5 rounded-xl font-bold transition-all duration-300
+                  ${copiedId === tpl.id 
+                    ? 'bg-accent text-white shadow-blue-glow' 
+                    : 'bg-white/5 border border-border text-muted hover:text-text hover:border-accent/40 hover:bg-white/10'
+                  }`}
               >
-                {copiedId === tpl.id ? <><CheckCircle2 size={14} className="text-acid" /> Copied</> : <><Copy size={14} /> Copy Schema</>}
+                {copiedId === tpl.id ? <><CheckCircle2 size={14} /> Copied</> : <><Copy size={14} /> Copy Source</>}
               </button>
             </div>
           </motion.div>
         ))}
       </div>
+
       {filtered.length === 0 && (
-         <div className="py-20 text-center text-muted">No templates matching "{search}" found.</div>
+        <div className="py-40 text-center">
+          <div className="w-16 h-16 rounded-full bg-white/5 border border-border flex items-center justify-center mx-auto mb-6">
+            <Search className="text-muted" size={24} />
+          </div>
+          <p className="text-xl font-display font-black text-text tracking-tighter mb-2">No results found</p>
+          <p className="text-muted text-sm font-medium">Try different blueprint keywords.</p>
+        </div>
       )}
     </div>
   )

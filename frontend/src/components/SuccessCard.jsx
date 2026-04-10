@@ -75,20 +75,20 @@ function CopyButton({ text, label = 'Copy' }) {
 function TokenisedCode({ code }) {
   const lines = code.split('\n')
   return (
-    <div className="font-mono text-sm leading-relaxed">
+    <div className="font-mono text-[13px] leading-relaxed">
       {lines.map((line, i) => {
         const highlighted = line
-          .replace(/(\/\/.*|#.*)/g, '<span class="text-muted">$1</span>')
-          .replace(/(\"(?:[^\"\\]|\\.)*\")/g, '<span class="text-sky">$1</span>')
-          .replace(/\b(const|import|from|await|async|method|headers)\b/g, '<span class="text-acid/80">$1</span>')
-          .replace(/\b(fetch|axios|get|console|log|response|data)\b/g, '<span class="text-ember/90">$1</span>')
-          .replace(/(curl|GET|Content-Type)/g, '<span class="text-warn/90">$1</span>')
+          .replace(/(\/\/.*|#.*)/g, '<span class="text-muted/50 italic">$1</span>')
+          .replace(/(\"(?:[^\"\\]|\\.)*\")/g, '<span class="text-sky/90">$1</span>')
+          .replace(/\b(const|import|from|await|async|method|headers|POST|GET)\b/g, '<span class="text-accent">$1</span>')
+          .replace(/\b(fetch|axios|get|console|log|response|data)\b/g, '<span class="text-text/70">$1</span>')
+          .replace(/([\{\}\[\]\(\)])/g, '<span class="text-muted/60">$1</span>')
         return (
-          <div key={i} className="flex">
-            <span className="select-none text-muted/40 w-8 shrink-0 text-right mr-4 tabular-nums text-xs pt-0.5">
+          <div key={i} className="flex py-0.5">
+            <span className="select-none text-muted/30 w-8 shrink-0 text-right mr-5 tabular-nums text-[11px]">
               {i + 1}
             </span>
-            <span className="text-text/90 flex-1" dangerouslySetInnerHTML={{ __html: highlighted }} />
+            <span className="text-text/80 flex-1 whitespace-pre" dangerouslySetInnerHTML={{ __html: highlighted }} />
           </div>
         )
       })}
@@ -105,7 +105,7 @@ function FullScreenModal({ json, onClose }) {
         <span className="text-sm font-mono text-acid">Full JSON Payload</span>
         <div className="flex items-center gap-3">
           <CopyButton text={text} label="Copy All" />
-          <button onClick={onClose} className="text-dim hover:text-bright p-1.5 rounded-lg hover:bg-white/5 transition-colors">
+          <button onClick={onClose} className="text-dim hover:text-text p-1.5 rounded-lg hover:bg-subtle transition-colors">
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -157,7 +157,7 @@ export default function SuccessCard({ result, onDismiss }) {
           <span className="text-dim text-sm">
             Endpoint created
             {recordCount !== null && (
-              <span className="text-text/70"> · <span className="text-acid">{recordCount}</span> records</span>
+              <span className="text-text/70"> · <span className="text-acid font-bold">{recordCount}</span> records</span>
             )}
           </span>
           {onDismiss && (
@@ -168,7 +168,7 @@ export default function SuccessCard({ result, onDismiss }) {
         </div>
 
         {/* ── Live URL Card ── */}
-        <div className="card p-4 mb-3 group hover:shadow-panelHover transition-shadow duration-200">
+        <div className="card p-4 mb-3 group transition-all duration-200">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-muted font-mono tracking-wider uppercase">Live Endpoint</span>
             <a href={liveUrl} target="_blank" rel="noopener noreferrer"
@@ -176,13 +176,13 @@ export default function SuccessCard({ result, onDismiss }) {
               Open {LINK_SVG}
             </a>
           </div>
-          <div className="flex items-center gap-3 bg-surface rounded-lg px-4 py-3 border border-border group-hover:border-subtle transition-colors">
+          <div className="flex items-center gap-3 bg-panel rounded-lg px-4 py-3 border border-border group-hover:border-acid/20 transition-colors">
             <span className="text-xs font-mono bg-acid/10 text-acid px-2 py-0.5 rounded border border-acid/20">GET</span>
             <span className="font-mono text-sm text-text flex-1 truncate">{liveUrl}</span>
             <button
               onClick={copyUrl}
               className={`shrink-0 flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md transition-all duration-200 font-mono
-                ${urlCopied ? 'bg-acid/20 text-acid border border-acid/30' : 'bg-subtle text-dim hover:text-text border border-border'}`}
+                ${urlCopied ? 'bg-acid/20 text-acid border border-acid/30' : 'bg-surface text-dim hover:text-text border border-border'}`}
             >
               {urlCopied ? CHECK_SVG : COPY_SVG}
               <span>{urlCopied ? 'Copied' : 'Copy'}</span>
@@ -191,19 +191,16 @@ export default function SuccessCard({ result, onDismiss }) {
         </div>
 
         {/* ── Code Snippets ── */}
-        <div className="card overflow-hidden mb-3">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+        <div className="card overflow-hidden border border-white/5 bg-[#0b111a]/50 mb-4">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-muted" viewBox="0 0 16 16" fill="none">
-                <path d="M2 4h12M2 8h8M2 12h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-              <span className="text-xs font-display font-semibold text-dim uppercase tracking-widest">How to Use</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-accent">Node.js Snippet</span>
             </div>
             <div className="flex items-center gap-1">
               {TABS.map((tab) => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`text-xs font-mono px-3 py-1 rounded-md transition-all duration-150
-                    ${activeTab === tab.id ? 'bg-acid/15 text-acid border border-acid/25' : 'text-muted hover:text-dim'}`}>
+                  className={`text-[11px] font-bold px-3 py-1 rounded-lg transition-all
+                    ${activeTab === tab.id ? 'bg-accent/10 text-accent' : 'text-muted hover:text-text'}`}>
                   {tab.label}
                 </button>
               ))}
@@ -213,7 +210,7 @@ export default function SuccessCard({ result, onDismiss }) {
             <div className="absolute top-4 right-4 z-10">
               <CopyButton text={activeSnippet} />
             </div>
-            <div className="p-5 pt-4 overflow-x-auto bg-void/50">
+            <div className="p-6 pt-5 overflow-x-auto bg-[#080a0f]">
               <TokenisedCode code={activeSnippet} />
             </div>
           </div>
@@ -221,19 +218,19 @@ export default function SuccessCard({ result, onDismiss }) {
 
         {/* ── Full JSON Preview ── */}
         <div className="card overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-border bg-panel/30">
             <span className="text-xs font-mono text-muted uppercase tracking-wider">JSON Payload</span>
             <div className="flex items-center gap-2">
               <CopyButton text={jsonText} label="Copy JSON" />
               <button
                 onClick={() => setFullScreen(true)}
-                className="text-xs font-mono text-dim hover:text-bright px-3 py-1.5 rounded-md border border-border hover:border-subtle transition-all"
+                className="text-xs font-mono text-dim hover:text-text px-3 py-1.5 rounded-md border border-border hover:border-subtle transition-all"
               >
                 ⛶ Full Screen
               </button>
             </div>
           </div>
-          <div className="max-h-96 overflow-y-auto p-5 bg-void/50">
+          <div className="max-h-96 overflow-y-auto p-5 bg-void">
             <pre className="font-mono text-xs text-text/60 leading-relaxed whitespace-pre-wrap">
               {jsonText}
             </pre>

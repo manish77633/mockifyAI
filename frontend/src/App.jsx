@@ -15,7 +15,7 @@ function ProtectedRoute({ children }) {
   
   if (loading) return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-acid border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-8 h-8 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
     </div>
   )
   
@@ -23,28 +23,30 @@ function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />
   }
 
-  // Wrap authenticated children in the Layout component
-  return <Layout>{children}</Layout>
+  // No longer wrapping in Layout here, as it's handled globally in App()
+  return children
 }
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login"  element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/pricing" element={<Pricing />} />
-          
-          {/* Protected Routes enclosed in Layout */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
-          <Route path="/templates" element={<ProtectedRoute><CommunityTemplates /></ProtectedRoute>} />
-          <Route path="/playground" element={<ProtectedRoute><APIPlayground /></ProtectedRoute>} />
-          
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login"  element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/pricing" element={<Pricing />} />
+            
+            {/* Protected Routes */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
+            <Route path="/templates" element={<ProtectedRoute><CommunityTemplates /></ProtectedRoute>} />
+            <Route path="/playground" element={<ProtectedRoute><APIPlayground /></ProtectedRoute>} />
+            
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
       </BrowserRouter>
     </AuthProvider>
   )

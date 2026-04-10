@@ -3,10 +3,10 @@ import AIModeForm from '../components/AIModeForm'
 import ManualModeForm from '../components/ManualModeForm'
 import SuccessCard from '../components/SuccessCard'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Code2 } from 'lucide-react'
+import { Sparkles, Code2, Zap } from 'lucide-react'
 
 const TABS = [
-  { id: 'ai', label: 'AI Generator', icon: <Sparkles size={18} />, desc: 'Describe your data, AI generates it.' },
+  { id: 'ai', label: 'AI Generator', icon: <Sparkles size={18} />, desc: 'Describe your schema, AI generates it.' },
   { id: 'manual', label: 'Manual JSON', icon: <Code2 size={18} />, desc: 'Paste your JSON and host it instantly.' },
 ]
 
@@ -20,76 +20,98 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="mb-8">
-        <h2 className="font-display font-bold text-3xl text-text mb-2 tracking-tight">Create a mock endpoint</h2>
-        <p className="text-dim text-base">Choose a mode, configure your payload, and get a live REST URL instantly.</p>
+    <div className="max-w-4xl mx-auto py-12 px-4">
+
+      {/* Precision Dash Header */}
+      <div className="mb-16 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/5 border border-accent/20 text-accent text-[10px] font-black uppercase tracking-[0.3em] mb-6"
+        >
+          <Zap size={12} fill="currentColor" /> Live Engine V2.0
+        </motion.div>
+        <h2 className="font-display font-black text-5xl md:text-6xl text-text mb-4 tracking-tighter">
+          Architect <span className="text-accent">Endpoints.</span>
+        </h2>
+        <p className="text-dim text-lg font-medium max-w-xl mx-auto">
+          Deploy deterministic, high-fidelity mock environments at the edge in seconds.
+        </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-8">
+      {/* Mode Selection Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         {TABS.map((tab) => (
           <motion.button
             whileTap={{ scale: 0.98 }}
             key={tab.id}
             onClick={() => { setActiveTab(tab.id); setSuccessResult(null) }}
-            className={`flex items-start gap-4 p-4 rounded-xl border text-left transition-all duration-300 ${
-              activeTab === tab.id
-                ? 'bg-acid/10 border-acid/40 shadow-glow'
-                : 'bg-surface border-border hover:border-acid/20 hover:bg-subtle'
-            }`}
+            className={`glass glass-hover flex flex-col gap-5 p-8 rounded-[2rem] text-left relative overflow-hidden group ${activeTab === tab.id
+                ? 'border-accent shadow-blue-glow bg-accent/5'
+                : 'hover:border-accent/40 bg-white/[0.02]'
+              }`}
           >
-            <span className={`p-2 rounded-lg border transition-colors ${
-              activeTab === tab.id ? 'bg-acid/20 text-acid border-acid/30' : 'bg-void text-muted border-border'
-            }`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${activeTab === tab.id ? 'bg-accent text-white border-accent shadow-glass-inner' : 'bg-surface text-muted border-border group-hover:border-accent/30'
+              }`}>
               {tab.icon}
-            </span>
+            </div>
             <div>
-              <p className={`font-display font-semibold text-sm mb-1 ${activeTab === tab.id ? 'text-acid' : 'text-text'}`}>
+              <p className={`font-display font-bold text-xl mb-1 tracking-tight ${activeTab === tab.id ? 'text-accent' : 'text-text'}`}>
                 {tab.label}
               </p>
-              <p className="text-xs text-muted leading-relaxed">{tab.desc}</p>
+              <p className="text-sm text-dim leading-relaxed font-medium">{tab.desc}</p>
             </div>
           </motion.button>
         ))}
       </div>
 
-      <div className="card p-6 border-border bg-surface shadow-xl relative overflow-hidden">
-        <div className="flex items-center gap-3 mb-6 pb-5 border-b border-border">
-          <div className="p-2 rounded-lg border bg-acid/10 text-acid border-acid/20">
+      {/* Configuration Core */}
+      <div className="glass rounded-[2.5rem] p-4 md:p-8 bg-panel border-2 border-border/10 shadow-2xl relative">
+        <div className="flex items-center gap-4 mb-8 pb-6 border-b border-border/10">
+          <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center text-accent border-accent/20">
             {TABS.find(t => t.id === activeTab)?.icon}
           </div>
           <div>
-            <h3 className="font-display font-semibold text-text">{activeTab === 'ai' ? 'AI Auto-Generation' : 'Manual Upload'}</h3>
-            <p className="text-xs text-muted">{activeTab === 'ai' ? 'Powered by Meta Llama 3.1 70B' : 'Standard JSON Schema via body insertion'}</p>
+            <h3 className="font-display font-black text-sm text-text uppercase tracking-[0.2em] mb-1">Configuration</h3>
+            <p className="text-xs text-dim font-bold">{activeTab === 'ai' ? 'Deterministic Llama 3.1 Synthesis' : 'Stateless Manual Schema Injection'}</p>
           </div>
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }}>
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: -10 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
             {activeTab === 'ai' ? <AIModeForm onSuccess={handleSuccess} /> : <ManualModeForm onSuccess={handleSuccess} />}
           </motion.div>
         </AnimatePresence>
       </div>
 
-      <div id="success-anchor" className="mt-8">
+      {/* Success Output */}
+      <div id="success-anchor" className="mt-12">
         <AnimatePresence>
           {successResult && (
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}>
               <SuccessCard result={successResult} onDismiss={() => setSuccessResult(null)} />
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="mt-10 grid grid-cols-3 gap-4">
+      {/* Metrics Row */}
+      <div className="mt-20 pt-12 border-t border-border/10 grid grid-cols-2 md:grid-cols-4 gap-8">
         {[
-          { label: 'Avg response time', value: '<15ms' },
-          { label: 'Global Edge nodes', value: '14' },
-          { label: 'Uptime SLA', value: '99.9%' },
+          { label: 'Latency avg.', value: '12ms' },
+          { label: 'Cloud Nodes', value: '24+' },
+          { label: 'Uptime SLA', value: '100%' },
+          { label: 'Auth Layers', value: 'JWT' },
         ].map((stat, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.1 }} className="card px-5 py-4 text-center border border-border/50 bg-subtle/30">
-            <p className="font-display font-bold text-acid text-xl">{stat.value}</p>
-            <p className="text-xs text-muted mt-1">{stat.label}</p>
+          <motion.div key={i} whileHover={{ y: -3 }} className="text-center group">
+            <p className="font-display font-black text-accent text-3xl tracking-tighter group-hover:scale-105 transition-transform">{stat.value}</p>
+            <p className="text-[10px] text-muted font-black uppercase tracking-widest mt-2">{stat.label}</p>
           </motion.div>
         ))}
       </div>
