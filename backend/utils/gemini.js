@@ -1,7 +1,7 @@
 const GEMINI_API_URL_PRIMARY =
   'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 const GEMINI_API_URL_FALLBACK =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-live-preview:generateContent';
 
 const TIMEOUT_MS = parseInt(process.env.GEMINI_TIMEOUT_MS, 10) || 30_000;
 
@@ -53,7 +53,7 @@ async function generateMockData(userPrompt) {
     });
 
     if (!response.ok && response.status === 503) {
-      console.warn(`[Gemini API] Primary model 503, falling back to 1.5-flash`);
+      console.warn(`[Gemini API] Primary model 503, falling back to 3.1-flash`);
       response = await fetch(`${GEMINI_API_URL_FALLBACK}?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

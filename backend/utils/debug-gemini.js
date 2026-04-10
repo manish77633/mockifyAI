@@ -24,9 +24,9 @@ async function checkModel(version, model) {
 
 async function run() {
     const models = [
-        'gemini-1.5-flash',
-        'gemini-1.5-flash-latest',
-        'gemini-1.5-flash-001',
+        'gemini-2.5-flash',
+        'gemini-2.5-pro',
+        'gemini-3.1-flash-live-preview',
         'gemini-1.5-pro',
         'gemini-pro'
     ];
