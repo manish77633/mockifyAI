@@ -41,7 +41,7 @@ function checkPayloadSize(payload, isPro) {
  */
 function buildLiveUrl(req, username, endpoint) {
   const base = process.env.API_BASE_URL || `${req.protocol}://${req.get('host')}`;
-  return `${base}/api/${username}/${endpoint}`;
+  return `${base}/api/mock/${username}/${endpoint}`;
 }
 
 // ─── Controller: createEndpointModeA (AI Generator) ──────────────────────────

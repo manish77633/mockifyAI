@@ -139,7 +139,7 @@ export default function ManualModeForm({ onSuccess }) {
         <div className="flex items-center">
           <span className="bg-subtle border border-r-0 border-border rounded-l-xl px-3 py-3
                            text-muted text-sm font-mono shrink-0 whitespace-nowrap">
-            /api/{user?.username || 'user'}/
+            /api/mock/{user?.username || 'user'}/
           </span>
           <input
             type="text"

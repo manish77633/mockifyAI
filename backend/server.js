@@ -68,12 +68,12 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 
-// Management CRUD (Yahan limiter nahi chahiye ya alag chahiye)
+// Management CRUD
 app.use('/api/endpoints', require('./routes/apiRoutes'));
 
-// Public Mock Serve (Ispe limiter zaroori hai)
-// Isko hamesha endpoints ke BAAD rakho taaki specific routes pehle match ho jayein
-app.use('/api', mockFetchLimiter, require('./routes/apiRoutes'));
+// Public Mock Serve — mounted at /api/mock to avoid shadowing /api/auth, /api/users etc.
+// URL format: /api/mock/:username/:endpointName
+app.use('/api/mock', mockFetchLimiter, require('./routes/mockRoutes'));
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 const path = require('path');

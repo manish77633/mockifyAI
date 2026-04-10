@@ -61,8 +61,10 @@ export default function EndpointsList({ refresh }) {
   return (
     <div className="space-y-2 mt-1">
       {endpoints.map((ep) => {
-        const baseOrigin = window.location.hostname === 'localhost' ? 'http://localhost:5000' : window.location.origin
-        const liveUrl = `${baseOrigin}/api/${ep.username}/${ep.endpoint}`
+        const backendBase = import.meta.env.VITE_API_URL
+          ? import.meta.env.VITE_API_URL.replace(/\/api$/, '')
+          : (window.location.hostname === 'localhost' ? 'http://localhost:5000' : window.location.origin)
+        const liveUrl = `${backendBase}/api/mock/${ep.username}/${ep.endpoint}`
         return (
         <div
           key={ep._id}
