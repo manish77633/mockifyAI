@@ -14,8 +14,8 @@ User request: "${userPrompt}"`;
 }
 
 async function generateMockData(userPrompt) {
-  const apiKey = process.env.NVIDIA_API_KEY;
-  if (!apiKey) throw new Error('NVIDIA_API_KEY is not configured.');
+  const apiKey = process.env.NVIDIA_API_KEY || process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('API Key (NVIDIA_API_KEY or GEMINI_API_KEY) is not configured.');
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
