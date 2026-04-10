@@ -1,32 +1,32 @@
 :root {
-  /* Dark mode (default) */
-  --bg-color: #080A0F;
-  --surface-color: #141820;
-  --panel-color: #0E1117;
-  --text-main: #E2E8F0;
+  /* Dark mode (default) - Obsidian & Acid Lime */
+  --bg-color: #050505;
+  --surface-color: #121212;
+  --panel-color: #0a0a0a;
+  --text-main: #F8FAFC;
   --text-dim: #94A3B8;
   --text-muted: #64748B;
-  --border-color: #1E2433;
-  --acid: #00FF88;
-  --acid-dim: #00CC6A;
+  --border-color: #27272A;
+  --acid: #D1FF00;
+  --acid-dim: #B8E600;
   --void: #000000;
   --subtle: rgba(255, 255, 255, 0.05);
-  --grid-color: rgba(30, 36, 51, 0.4);
+  --grid-color: rgba(39, 39, 42, 0.4);
 }
 
 .light-mode {
-  --bg-color: #F8FAFC;
+  --bg-color: #FDFDFD;
   --surface-color: #FFFFFF;
-  --panel-color: #F1F5F9;
-  --text-main: #1E293B;
+  --panel-color: #F8FAFC;
+  --text-main: #020617;
   --text-dim: #475569;
   --text-muted: #64748B;
   --border-color: #E2E8F0;
-  --acid: #00B35D; /* Slightly darker green for light bg */
-  --acid-dim: #008C4A;
+  --acid: #22C55E; 
+  --acid-dim: #16A34A;
   --void: #FFFFFF;
-  --subtle: rgba(0, 0, 0, 0.05);
-  --grid-color: rgba(200, 200, 200, 0.2);
+  --subtle: rgba(0, 0, 0, 0.03);
+  --grid-color: rgba(100, 116, 139, 0.1);
 }
 
 @tailwind base;
@@ -52,7 +52,7 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
   /* Selection */
-  ::selection { background: rgba(0, 255, 136, 0.2); color: inherit; }
+  ::selection { background: rgba(209, 255, 0, 0.2); color: inherit; }
 }
 
 @layer components {
@@ -72,13 +72,14 @@
 
   .btn-primary {
     background-color: var(--acid);
-    color: #080A0F; /* Keep dark text on bright green buttons */
+    color: #050505; 
     @apply font-display font-semibold px-6 py-2.5 rounded-lg
            active:scale-95 transition-all duration-150
            disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100;
   }
   .btn-primary:hover {
     background-color: var(--acid-dim);
+    box-shadow: 0 0 15px rgba(209, 255, 0, 0.4);
   }
 
   .btn-ghost {
@@ -90,6 +91,7 @@
   .btn-ghost:hover {
     color: var(--text-main);
     border-color: var(--text-muted);
+    background-color: var(--subtle);
   }
 
   .input-base {
@@ -101,7 +103,7 @@
   .input-base:focus {
     @apply outline-none ring-1;
     border-color: var(--acid);
-    --tw-ring-color: rgba(0, 255, 136, 0.3);
+    --tw-ring-color: rgba(209, 255, 0, 0.3);
   }
   .input-base::placeholder {
     color: var(--text-muted);
@@ -110,7 +112,10 @@
   .card {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
-    @apply rounded-2xl shadow-sm;
+    @apply rounded-2xl shadow-sm transition-all duration-300;
+  }
+  .card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   }
 }
 
