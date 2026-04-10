@@ -56,6 +56,10 @@ const mockFetchLimiter = rateLimit({
 app.use(express.json({ limit: '11mb' }));
 app.use(express.urlencoded({ extended: true, limit: '32kb' }));
 
+app.get('/health', (_req, res) =>
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+);
+
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth',      require('./routes/auth'));
 app.use('/api/users',     require('./routes/users'));
@@ -63,9 +67,7 @@ app.use('/api/payment',   require('./routes/paymentRoutes'));
 app.use('/api/endpoints', require('./routes/apiRoutes'));          // management CRUD
 app.use('/api',           mockFetchLimiter, require('./routes/apiRoutes')); // public wildcard
 
-app.get('/health', (_req, res) =>
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-);
+
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 const path = require('path');
