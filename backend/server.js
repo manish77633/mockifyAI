@@ -5,14 +5,19 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 const app = express();
+
+// ─── Health Check (Top level, skips logging) ──────────────────────────────────
+app.get('/health', (_req, res) =>
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+);
 
 // ─── Security & Logging ───────────────────────────────────────────────────────
 app.use(helmet());
 app.use(cors({
   origin: (origin, callback) => {
-    // List of allowed origins
     const allowed = [process.env.CLIENT_ORIGIN, 'http://localhost:3000'].filter(Boolean);
     if (!origin || allowed.includes(origin) || process.env.NODE_ENV !== 'production') {
       callback(null, true);
@@ -22,84 +27,58 @@ app.use(cors({
   },
   credentials: true
 }));
+
 app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', {
   skip: (req) => req.url === '/health'
 }));
 app.set('trust proxy', 1);
 
-// ─── Rate Limiters ────────────────────────────────────────────────────────────
-// const generalLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, max: 100,
-//   standardHeaders: true, legacyHeaders: false,
-//   message: { success: false, message: 'Too many requests. Please try again later.' },
-// });
-
-// 60 req/min/IP — public dynamic mock-serve route
-const mockFetchLimiter = rateLimit({
-  windowMs: 60 * 1000, max: 60,
-  standardHeaders: true, legacyHeaders: false,
-  keyGenerator: (req) => req.ip,
-  message: { success: false, message: 'Rate limit exceeded. Max 60 requests/min per IP.' },
-});
-
-// 10 req/min — Gemini AI generation
-// const aiGeneratorLimiter = rateLimit({
-//   windowMs: 60 * 1000, max: 10,
-//   standardHeaders: true, legacyHeaders: false,
-//   message: { success: false, message: 'AI generation rate limit: max 10 requests/min.' },
-// });
-
-// app.use('/api', generalLimiter);
-// app.use('/api/endpoints/generate', aiGeneratorLimiter); // Must precede router mount
-
 // ─── Body Parsers ─────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '11mb' }));
 app.use(express.urlencoded({ extended: true, limit: '32kb' }));
 
-// ... upar ka saara code same hai ...
+// ─── Rate Limiters ────────────────────────────────────────────────────────────
+const mockFetchLimiter = rateLimit({
+  windowMs: 60 * 1000, 
+  max: 60,
+  standardHeaders: true, 
+  legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  message: { success: false, message: 'Rate limit exceeded. Max 60 requests/min per IP.' },
+});
 
-// ─── Health Check (Sabse upar rakho taaki logs clean rahein) ──────────────────
-app.get('/health', (_req, res) =>
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-);
-
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── API Routes ───────────────────────────────────────────────────────────────
+// Explicitly mount auth, users, and endpoints first
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
-
-// Management CRUD
 app.use('/api/endpoints', require('./routes/apiRoutes'));
-
-// Public Mock Serve — mounted at /api/mock to avoid shadowing /api/auth, /api/users etc.
-// URL format: /api/mock/:username/:endpointName
 app.use('/api/mock', mockFetchLimiter, require('./routes/mockRoutes'));
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
-const path = require('path');
 if (process.env.NODE_ENV === 'production') {
-  // Static files pehle serve karo
+  // Serve static files from the frontend/dist folder
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-  // Catch-all route
+  
+  // Smart Catch-all Route
   app.get('*', (req, res, next) => {
-    // Agar request /api se start ho rahi hai aur yahan tak pahuchi hai,
-    // iska matlab wo API exist nahi karti. Toh seedha 404 do, HTML nahi.
+    // If request is for an API route that wasn't matched above, 
+    // pass it to the 404 JSON handler
     if (req.originalUrl.startsWith('/api')) {
-      return next(); // Ye niche wale 404 handler pe bhej dega
+      return next();
     }
+    // Otherwise, send the frontend's index.html
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
 }
 
-// ─── 404 & Error Handlers (Same as your code) ─────────────────────────────────
+// ─── 404 API Error Handler ────────────────────────────────────────────────────
+// Any request reaching here will receive a JSON 404 response
 app.use((_req, res) =>
   res.status(404).json({ success: false, message: 'Route not found.' })
 );
-// ... baaki boot logic same hai ...
 
 // ─── Global Error Handler ─────────────────────────────────────────────────────
-// eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   console.error('[GlobalError]', err);
   const status = err.status || err.statusCode || 500;
@@ -114,16 +93,26 @@ app.use((err, _req, res, _next) => {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) { console.error('FATAL: MONGO_URI not set.'); process.exit(1); }
+if (!MONGO_URI) { 
+  console.error('FATAL: MONGO_URI not set.'); 
+  process.exit(1); 
+}
 
+// Connect to MongoDB first, then start the server
 mongoose
   .connect(MONGO_URI, { serverSelectionTimeoutMS: 5000, socketTimeoutMS: 45000 })
   .then(() => {
     console.log('✅  MongoDB connected');
     app.listen(PORT, () => console.log(`🚀  MockifyAI listening on :${PORT}`));
   })
-  .catch((err) => { console.error('FATAL:', err.message); process.exit(1); });
+  .catch((err) => { 
+    console.error('FATAL:', err.message); 
+    process.exit(1); 
+  });
 
-process.on('SIGTERM', async () => { await mongoose.connection.close(); process.exit(0); });
+process.on('SIGTERM', async () => { 
+  await mongoose.connection.close(); 
+  process.exit(0); 
+});
 
 module.exports = app;
