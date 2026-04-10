@@ -9,7 +9,7 @@ import ThreeBackground from './ThreeBackground'
 
 const LOGO_SVG = (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
@@ -30,7 +30,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden transition-colors duration-500 bg-void">
-      
+
       {/* ── Background Layer (Z-0) ── */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <ThreeBackground />
@@ -45,21 +45,21 @@ export default function Layout({ children }) {
           {LOGO_SVG}
           <span className="font-display font-black text-sm tracking-tighter hidden md:block text-text">MockifyAI</span>
         </Link>
-        
-        <div className="h-6 w-[1px] bg-border/50 mx-4" />
 
-        <div className="flex-1 flex justify-center gap-2">
+        <div className="h-6 w-[1px] bg-border/50 mx-1 md:mx-4" />
+
+        <div className="flex-1 flex justify-center gap-1 md:gap-2 overflow-x-auto no-scrollbar">
           {navItems.map((item) => {
             const isActive = location.pathname.startsWith(item.path)
             return (
-              <Link key={item.name} to={item.path} className="relative px-3 py-1.5 rounded-full transition-all group">
-                <span className={`relative z-10 font-display font-bold text-[10px] uppercase tracking-widest transition-colors ${
-                  isActive ? 'text-accent' : 'text-muted hover:text-text'
-                }`}>
-                  {item.name}
+              <Link key={item.name} to={item.path} className="relative px-2 md:px-3 py-1.5 rounded-full transition-all group shrink-0">
+                <span className={`relative z-10 font-display font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2 ${isActive ? 'text-accent' : 'text-muted hover:text-text'
+                  }`}>
+                  <span className="md:hidden">{item.icon}</span>
+                  <span className="hidden md:inline">{item.name}</span>
                 </span>
                 {isActive && (
-                  <motion.div 
+                  <motion.div
                     layoutId="pill-nav-active"
                     className="absolute inset-0 bg-accent/5 border border-accent/20 rounded-full"
                     transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
@@ -70,7 +70,7 @@ export default function Layout({ children }) {
           })}
         </div>
 
-        <div className="h-6 w-[1px] bg-border/50 mx-4" />
+        <div className="h-6 w-[1px] bg-border/50 mx-1 md:mx-4" />
 
         <div className="flex items-center gap-3 px-2">
           <button onClick={toggleTheme} className="p-2 rounded-full text-muted hover:text-text hover:bg-white/5 transition-all">
@@ -79,7 +79,7 @@ export default function Layout({ children }) {
 
           {user && (
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
                 className="flex items-center gap-2 pl-3 p-1 rounded-full border border-border bg-white/5 hover:border-accent/40 transition-all"
               >
@@ -91,26 +91,26 @@ export default function Layout({ children }) {
 
               <AnimatePresence>
                 {isProfileOpen && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute top-full right-0 mt-3 w-56 glass p-2 rounded-2xl shadow-2xl origin-top-right z-[101] border border-white/5"
+                    className="absolute top-full right-0 mt-3 w-60 bg-[#12141c] border border-white/20 p-2.5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] origin-top-right z-[101]"
                   >
-                    <div className="px-3 py-1.5 border-b border-white/5">
-                      <p className="text-[10px] text-muted uppercase font-black tracking-widest mb-1">Account</p>
-                      <p className="text-xs font-bold text-text truncate">{user.username}</p>
+                    <div className="px-3.5 py-2 border-b border-white/10">
+                      <p className="text-[10px] text-accent uppercase font-black tracking-widest mb-1">Account</p>
+                      <p className="text-sm font-bold text-white truncate">{user.username}</p>
                     </div>
                     <div className="py-2">
-                      <button onClick={() => { setIsDocsOpen(true); setIsProfileOpen(false); }} className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-muted hover:text-text hover:bg-white/5 rounded-lg transition-colors">
-                        <FileJson size={14} /> Documentation
+                      <button onClick={() => { setIsDocsOpen(true); setIsProfileOpen(false); }} className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                        <FileJson size={16} className="text-accent/60" /> Documentation
                       </button>
-                      <Link to="/pricing" onClick={() => setIsProfileOpen(false)} className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-accent font-bold hover:bg-accent/5 rounded-lg transition-colors">
-                        <Zap size={14} /> Upgrade Plan
+                      <Link to="/pricing" onClick={() => setIsProfileOpen(false)} className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs text-accent font-bold hover:bg-accent/5 rounded-xl transition-all">
+                        <Zap size={16} /> Upgrade Plan
                       </Link>
-                      <div className="h-[1px] bg-white/5 my-2 mx-2" />
-                      <button onClick={logout} className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-muted hover:text-red-400 hover:bg-red-400/5 rounded-lg transition-colors">
-                        <LogOut size={14} /> Sign Out
+                      <div className="h-[1px] bg-white/10 my-2 mx-2" />
+                      <button onClick={logout} className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs text-slate-400 hover:text-red-400 hover:bg-red-400/5 rounded-xl transition-all">
+                        <LogOut size={16} /> Sign Out
                       </button>
                     </div>
                   </motion.div>
@@ -123,9 +123,8 @@ export default function Layout({ children }) {
 
       <DocsModal isOpen={isDocsOpen} onClose={() => setIsDocsOpen(false)} />
 
-      {/* ── Main Content Area (Z-10) ── */}
-      <main className="relative z-10 pt-32 pb-20 px-6 max-w-screen-xl mx-auto">
-        <motion.div 
+      <main className="relative z-10 pt-32 pb-20 px-4 md:px-6 max-w-screen-xl mx-auto">
+        <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}

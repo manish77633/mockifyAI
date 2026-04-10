@@ -32,28 +32,30 @@ export default function APIPlayground() {
 
       <div className="card flex-1 bg-surface border-border flex flex-col overflow-hidden">
         {/* URL Bar */}
-        <div className="p-4 border-b border-border flex items-center gap-3 bg-panel/50">
-          <select 
-            value={method}
-            onChange={(e) => setMethod(e.target.value)}
-            className="bg-transparent border border-border text-acid font-mono text-sm font-bold rounded-lg px-3 py-2.5 outline-none focus:border-acid"
-          >
-            <option>GET</option>
-            <option>POST</option>
-            <option>PUT</option>
-            <option>DELETE</option>
-          </select>
-          <input 
-            type="text" 
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter request URL"
-            className="flex-1 bg-void border border-border rounded-lg px-4 py-2.5 font-mono text-sm text-text focus:outline-none focus:border-acid/50 transition-colors"
-          />
+        <div className="p-4 border-b border-border flex flex-col md:flex-row md:items-center gap-3 bg-panel/50">
+          <div className="flex gap-3 flex-1">
+            <select 
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              className="bg-transparent border border-border text-accent font-mono text-sm font-bold rounded-lg px-3 py-2.5 outline-none focus:border-accent"
+            >
+              <option>GET</option>
+              <option>POST</option>
+              <option>PUT</option>
+              <option>DELETE</option>
+            </select>
+            <input 
+              type="text" 
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Enter request URL"
+              className="flex-1 min-w-0 bg-void border border-border rounded-lg px-4 py-2.5 font-mono text-sm text-text focus:outline-none focus:border-accent/50 transition-colors"
+            />
+          </div>
           <button 
             onClick={handleSend}
             disabled={loading}
-            className="btn-primary flex items-center gap-2 py-2.5"
+            className="btn-primary flex items-center justify-center gap-2 py-2.5 px-6 md:w-auto w-full"
           >
             {loading ? <span className="animate-spin text-void border-2 border-void/30 border-t-void rounded-full w-4 h-4" /> : <Play size={16} fill="currentColor" />}
             Send

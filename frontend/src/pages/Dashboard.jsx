@@ -40,7 +40,7 @@ export default function Dashboard() {
       </div>
 
       {/* Mode Selection Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-12">
         {TABS.map((tab) => (
           <motion.button
             whileTap={{ scale: 0.98 }}
@@ -102,7 +102,7 @@ export default function Dashboard() {
       </div>
 
       {/* Metrics Row */}
-      <div className="mt-20 pt-12 border-t border-border/10 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="mt-20 pt-12 border-t border-border/10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {[
           { label: 'Latency avg.', value: '12ms' },
           { label: 'Cloud Nodes', value: '24+' },
