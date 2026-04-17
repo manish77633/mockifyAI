@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { generateAIMock } from '../utils/api'
 import { useAuth } from '../hooks/useAuth'
+import AuthGateModal from './AuthGateModal'
 
 const PROMPT_SUGGESTIONS = [
   'Give me 5 e-commerce products with price, rating, and category',
@@ -21,11 +22,15 @@ export default function AIModeForm({ onSuccess }) {
   const [endpointName, setEndpointName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   const handleSubmit = async () => {
     setError(null)
     if (!prompt.trim())       return setError('Please enter a prompt.')
     if (!endpointName.trim()) return setError('Please enter an endpoint name.')
+
+    // Not logged in — show auth gate
+    if (!user) return setShowAuthModal(true)
 
     setLoading(true)
     try {
@@ -135,10 +140,13 @@ export default function AIModeForm({ onSuccess }) {
         ) : (
           <>
             {SPARKLE_SVG}
-            Generate Mock API
+            {user ? 'Generate Mock API' : 'Generate Mock API — Sign in to create'}
           </>
         )}
       </button>
+
+      {/* Auth Gate — only shown when unauthenticated user hits submit */}
+      <AuthGateModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   )
 }

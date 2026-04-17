@@ -47,8 +47,8 @@ export default function AnalyticsDashboard() {
               <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorHits" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--acid)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--acid)" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.25}/>
+                    <stop offset="95%" stopColor="#94A3B8" stopOpacity={0.03}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
@@ -56,9 +56,9 @@ export default function AnalyticsDashboard() {
                 <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--panel-color)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                  itemStyle={{ color: 'var(--acid)' }}
+                  itemStyle={{ color: '#3B82F6' }}
                 />
-                <Area type="monotone" dataKey="hits" stroke="var(--acid)" strokeWidth={2} fillOpacity={1} fill="url(#colorHits)" />
+                <Area type="monotone" dataKey="hits" stroke="#3B82F6" strokeWidth={2.5} fillOpacity={1} fill="url(#colorHits)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -74,9 +74,9 @@ export default function AnalyticsDashboard() {
                 <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: 'var(--panel-color)', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                  itemStyle={{ color: '#38BDF8' }}
+                  itemStyle={{ color: '#3B82F6' }}
                 />
-                <Line type="monotone" dataKey="latency" stroke="#38BDF8" strokeWidth={3} dot={{ fill: '#38BDF8', r: 4 }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="latency" stroke="#3B82F6" strokeWidth={3} dot={{ fill: '#3B82F6', r: 4 }} activeDot={{ r: 6, fill: '#60A5FA' }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

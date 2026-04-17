@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { createManualMock } from '../utils/api'
 import { useAuth } from '../hooks/useAuth'
+import AuthGateModal from './AuthGateModal'
 
 const EXAMPLE_JSON = `[
   {
@@ -35,45 +36,127 @@ function formatBytes(bytes) {
 }
 
 /**
- * Smart formatter: Tries to coerce messy JS-like syntax into valid JSON.
- * Handles: unquoted keys, trailing commas, leading array indices (0{ 1{)
+ * Robust JSON repair engine.
+ * Handles: missing commas, unclosed brackets/braces, single quotes,
+ * unquoted keys, trailing commas, JS comments, undefined/NaN/Infinity,
+ * extra closing brackets, bare values, and more.
  */
 function smartFormat(input) {
+  // Step 0: Already valid?
   try {
-    // Step 1: try as-is
     return { success: true, result: JSON.stringify(JSON.parse(input), null, 2) }
-  } catch {
-    // Step 2: Repair common issues
-    let s = input.trim()
+  } catch { /* continue to repair */ }
 
-    // Remove leading array index patterns: "0{" "1 {" at start of lines
-    s = s.replace(/^\s*\d+\s*(?=\{)/gm, '')
+  let s = input.trim()
 
-    // Convert single quotes to double quotes (simple cases)
-    s = s.replace(/'/g, '"')
+  // ── Pass 1: Structural cleanup ──────────────────────────────────────────────
 
-    // Remove trailing commas before } or ]
-    s = s.replace(/,\s*(\n?\s*[}\]])/g, '$1')
+  // Remove JS-style comments (// and /* */)
+  s = s.replace(/\/\/[^\n]*/g, '')
+  s = s.replace(/\/\*[\s\S]*?\*\//g, '')
 
-    // Quote unquoted object keys: word after { or , or [ followed by :
-    // handles: {id: 1, [id: 1, , id: 1
-    s = s.replace(/([{,\[]\s*)\n?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":')
+  // Remove leading array index patterns: "0{" "1 {" at start of lines
+  s = s.replace(/^\s*\d+\s*(?=\{)/gm, '')
 
-    // Remove JavaScript-style comments
-    s = s.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
+  // Convert single quotes to double quotes (but not inside already-double-quoted strings)
+  // Simple heuristic: replace ' used as string delimiters
+  s = s.replace(/'([^'\\]*(\\.[^'\\]*)*)'/g, '"$1"')
 
-    // If it doesn't start with [ or {, wrap it
-    if (!s.startsWith('[') && !s.startsWith('{')) {
-      s = `[${s}]`
+  // Replace JS undefined / NaN / Infinity with JSON-safe equivalents
+  s = s.replace(/\bundefined\b/g, 'null')
+  s = s.replace(/\bNaN\b/g, 'null')
+  s = s.replace(/\bInfinity\b/g, '999999999')
+  s = s.replace(/\b-Infinity\b/g, '-999999999')
+
+  // Remove trailing commas before } or ]
+  s = s.replace(/,(\s*[\}\]])/g, '$1')
+
+  // ── Pass 2: Key quoting ──────────────────────────────────────────────────────
+
+  // Quote unquoted object keys (handles keys after { , or newline)
+  s = s.replace(/([{,\[]\s*)\n?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":')
+  // Handle keys at start of object on their own line
+  s = s.replace(/^(\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/gm, '$1"$2":')
+
+  // ── Pass 3: Missing commas between adjacent elements ────────────────────────
+
+  s = s.replace(/\}(\s*)\{/g, '},$1{')         // } { → },{
+  s = s.replace(/\](\s*)\[/g, '],$1[')         // ] [ → ],[
+  s = s.replace(/\}(\s*)\[/g, '},$1[')         // } [ → },[
+  s = s.replace(/\](\s*)\{/g, '],$1{')         // ] { → ],{
+  // Newline: "value" \n "nextKey": → add comma
+  s = s.replace(/(["'\d\w\]])\s*\n(\s*"[^"]+"\s*:)/g, '$1,\n$2')
+  // Same-line: "value" "nextKey": → add comma (key is identified by trailing colon)
+  s = s.replace(/"([^"\\]*)"(\s+)("[^"\\]*"\s*:)/g, '"$1",$2$3')
+
+  // ── Pass 2.5 (runs AFTER comma fix): Add missing colons between key and value
+  // "key" "value"  → "key": "value"   (only when value is NOT a key, i.e. not followed by :)
+  // Safe because missing commas are already fixed above, so remaining "a" "b" = missing colon
+  s = s.replace(/"([^"\\]*)"(\s+)(?!\s*:)("[^"\\]*")(?!\s*:)/g, '"$1": $3')
+  // "key" 123 / true / false / null → "key": value
+  s = s.replace(/"([^"\\]*)"\s+(?=[\d\-]|true\b|false\b|null\b)/g, '"$1": ')
+
+  // ── Pass 4: Bracket balancing (char-by-char rebuild) ────────────────────────
+  function autoClose(str) {
+    const stack = []
+    let result = ''
+    let inString = false
+    let escape = false
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i]
+      if (escape)                  { escape = false; result += ch; continue }
+      if (ch === '\\' && inString) { escape = true;  result += ch; continue }
+      if (ch === '"')              { inString = !inString; result += ch; continue }
+      if (inString)                { result += ch; continue }
+      if (ch === '{')              { stack.push('}'); result += ch }
+      else if (ch === '[')         { stack.push(']'); result += ch }
+      else if (ch === '}' || ch === ']') {
+        if (stack.length && stack[stack.length - 1] === ch) {
+          stack.pop(); result += ch  // matched — keep
+        }
+        // unmatched extra closer → SKIP (physically removed)
+      } else { result += ch }
     }
+    return result + stack.reverse().join('')
+  }
 
-    try {
-      return { success: true, result: JSON.stringify(JSON.parse(s), null, 2) }
-    } catch (e) {
-      return { success: false, error: e.message }
+  s = autoClose(s)
+
+  // ── Pass 5: Wrap bare content ────────────────────────────────────────────────
+
+  const trimmed = s.trim()
+
+  if (!trimmed.startsWith('[') && !trimmed.startsWith('{')) {
+    // Bare key-value pairs without any brackets
+    const looksLikeKVPairs = /^\s*"[^"]+"\s*:/.test(trimmed)
+    s = looksLikeKVPairs ? `[{${s}}]` : `[${s}]`
+  } else if (trimmed.startsWith('{')) {
+    s = `[${s}]`  // single object → wrap in array
+  }
+
+  s = autoClose(s)
+
+  // ── Final parse ───────────────────────────────────────────────────────────────
+  try {
+    return { success: true, result: JSON.stringify(JSON.parse(s), null, 2) }
+  } catch (_) {}
+
+  // ── Rescue: KV pairs stranded inside [...] (user deleted opening {) ──────────
+  // e.g. [ "key": val, "key2": val2 ] → [{ "key": val, "key2": val2 }]
+  const st = s.trim()
+  if (st.startsWith('[') && st.endsWith(']')) {
+    const inner = st.slice(1, -1).trim()
+    if (/^\s*"[^"]+"\s*:/.test(inner)) {
+      const rescued = `[{${inner}}]`
+      try {
+        return { success: true, result: JSON.stringify(JSON.parse(rescued), null, 2) }
+      } catch (_) {}
     }
   }
+
+  return { success: false, error: 'Could not repair JSON' }
 }
+
 
 export default function ManualModeForm({ onSuccess }) {
   const { user } = useAuth()
@@ -82,6 +165,7 @@ export default function ManualModeForm({ onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [smartFormatMsg, setSmartFormatMsg] = useState(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
 
   const validation = rawJson.trim() ? validateJSON(rawJson) : null
   const byteSize = rawJson ? new Blob([rawJson]).size : 0
@@ -114,6 +198,9 @@ export default function ManualModeForm({ onSuccess }) {
 
     const { valid, parsed, error: jsonErr } = validateJSON(rawJson)
     if (!valid) return setError(`Invalid JSON: ${jsonErr}`)
+
+    // Not logged in — show auth gate
+    if (!user) return setShowAuthModal(true)
 
     setLoading(true)
     try {
@@ -165,7 +252,7 @@ export default function ManualModeForm({ onSuccess }) {
             )}
             <button
               onClick={handleSmartFormat}
-              title="Fix messy JS-copied objects with unquoted keys"
+              title="Auto-repairs: missing commas, unclosed brackets, unquoted keys, single quotes, trailing commas, JS comments, undefined/NaN"
               className="btn-ghost text-xs text-acid border-acid/30 hover:bg-acid/10"
             >
               ✨ Smart Fix
@@ -255,10 +342,13 @@ export default function ManualModeForm({ onSuccess }) {
             <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none">
               <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
             </svg>
-            Create Endpoint
+            {user ? 'Create Endpoint' : 'Create Endpoint — Sign in first'}
           </>
         )}
       </button>
+
+      {/* Auth Gate — only shown when unauthenticated user hits submit */}
+      <AuthGateModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
     </div>
   )
 }

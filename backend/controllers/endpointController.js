@@ -333,3 +333,28 @@ exports.listEndpoints = async (req, res, next) => {
     next(err);
   }
 };
+
+// ─── Controller: getEndpointById (GET — single endpoint with payload) ─────────
+/**
+ * GET /api/endpoints/:id/detail
+ * Auth: required — returns a single endpoint WITH payload (for history expand)
+ */
+exports.getEndpointById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'Invalid endpoint ID.' });
+    }
+
+    const mock = await MockEndpoint.findOne({ _id: id, owner: req.user.id, isActive: true }).lean();
+    if (!mock) return res.status(404).json({ success: false, message: 'Endpoint not found.' });
+
+    return res.json({
+      success: true,
+      data: mock,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

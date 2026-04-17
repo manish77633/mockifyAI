@@ -9,6 +9,7 @@ const {
   updateEndpoint,
   deleteEndpoint,
   listEndpoints,
+  getEndpointById,
 } = require('../controllers/endpointController');
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -25,6 +26,9 @@ router.post('/generate', protect, createEndpointModeA);
 
 // POST   /api/endpoints/manual     → Mode B: paste raw JSON
 router.post('/manual', protect, createEndpointModeB);
+
+// GET    /api/endpoints/:id/detail  → single endpoint WITH payload (for history expand)
+router.get('/:id/detail', protect, getEndpointById);
 
 // PUT    /api/endpoints/:id        → update payload / rename slug
 router.put('/:id', protect, updateEndpoint);

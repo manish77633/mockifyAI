@@ -19,6 +19,8 @@ export default {
         dim:     'var(--text-dim)',
         text:    'var(--text-main)',
         accent:  '#3B82F6', // ClipDotHub Blue
+        acid:    'var(--acid)',
+        danger:  'var(--danger)',
         'accent-soft': 'rgba(59, 130, 246, 0.1)',
       },
       boxShadow: {

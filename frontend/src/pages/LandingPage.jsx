@@ -1,9 +1,10 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { Zap, ArrowRight, Play, Terminal, Activity, Shield } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { Stagger, StaggerChild, FadeIn, FloatingElement, TypewriterText } from "../components/Animations";
+import AuthGateModal from "../components/AuthGateModal";
 
 // Magnetic Interaction Component
 function Magnetic({ children }) {
@@ -42,6 +43,15 @@ function Magnetic({ children }) {
 export default function LandingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleStartBuilding = () => {
+    if (user) {
+      navigate('/dashboard')
+    } else {
+      setShowAuthModal(true)
+    }
+  }
 
   return (
     <div className="relative min-h-screen overflow-hidden flex flex-col items-center w-full">
@@ -61,7 +71,7 @@ export default function LandingPage() {
           {/* High-Impact Typography with ClipHub Gradient */}
           <StaggerChild>
             <h1 className="font-display font-black text-6xl md:text-8xl tracking-tighter leading-[1.0] mb-8">
-              <span className="text-white">
+              <span className="text-text">
                 <TypewriterText text="Design anything," speed={70} /> <br />
               </span>
               <span className="bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(135deg, #5b9bff 0%, #93c5fd 50%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -82,7 +92,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-24">
               <Magnetic>
                  <button 
-                  onClick={() => navigate(user ? '/dashboard' : '/signup')} 
+                  onClick={handleStartBuilding}
                   className="btn-primary px-10 py-4 text-lg group shadow-blue-glow/20"
                 >
                   Start Building <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -98,6 +108,9 @@ export default function LandingPage() {
               </button>
             </div>
           </StaggerChild>
+
+          {/* Auth Gate Modal — triggered from landing CTA */}
+          <AuthGateModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
 
           {/* Social Proof: Trusted by Developers */}
           <StaggerChild>
@@ -117,16 +130,16 @@ export default function LandingPage() {
               <div className="relative group max-w-4xl mx-auto">
                 <div className="absolute -inset-10 bg-accent/10 rounded-[4rem] blur-[100px] opacity-20 pointer-events-none" />
                 <div className="relative glass rounded-[2rem] overflow-hidden border border-border shadow-2xl bg-panel/50 backdrop-blur-xl">
-                  <div className="flex items-center justify-between px-6 h-14 border-b border-border bg-white/[0.02]">
+                  <div className="flex items-center justify-between px-6 h-14 border-b border-border" style={{ backgroundColor: 'var(--panel-color)' }}>
                     <div className="flex gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500/20" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
-                      <div className="w-3 h-3 rounded-full bg-green-500/20" />
+                      <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                      <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                      <div className="w-3 h-3 rounded-full bg-green-500/60" />
                     </div>
                     <div className="text-[10px] font-mono text-muted uppercase tracking-[0.2em] font-black">mock_engine_core.py</div>
                     <div className="w-10" />
                   </div>
-                  <div className="p-8 text-left bg-black/40">
+                  <div className="p-8 text-left" style={{ backgroundColor: 'var(--editor-bg, rgba(0,0,0,0.4))' }}>
                     <pre className="font-mono text-sm md:text-base leading-relaxed overflow-x-auto">
                       <span className="text-accent">@engine.route</span>(<span className="text-sky">"/v1/predict"</span>){"\n"}
                       <span className="text-accent">def</span> <span className="text-text">generate_mock</span>():{"\n"}
@@ -172,7 +185,7 @@ export default function LandingPage() {
             <motion.div 
               key={item.title}
               whileHover={{ y: -8 }}
-              className="p-10 rounded-[2.5rem] glass border border-border bg-panel/30 flex flex-col items-center text-center group"
+              className="p-10 rounded-[2.5rem] glass glass-hover border border-border flex flex-col items-center text-center group"
             >
               <div className="w-16 h-16 rounded-3xl bg-accent/10 flex items-center justify-center text-accent mb-8 group-hover:scale-110 transition-transform">
                 {item.icon}

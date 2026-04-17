@@ -100,20 +100,58 @@ function TokenisedCode({ code }) {
 function FullScreenModal({ json, onClose }) {
   const text = JSON.stringify(json, null, 2)
   return (
-    <div className="fixed inset-0 z-[200] flex flex-col bg-void/95 backdrop-blur-xl">
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-        <span className="text-sm font-mono text-acid">Full JSON Payload</span>
+    <div className="fixed inset-0 z-[300] flex flex-col" style={{ backgroundColor: 'var(--bg-color)' }}>
+      {/* Header — sits below the navbar with top padding */}
+      <div
+        className="flex items-center justify-between px-6 py-4 border-b shrink-0"
+        style={{
+          paddingTop: '80px',
+          borderColor: 'var(--border-color)',
+          backgroundColor: 'var(--panel-color)',
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+          <span className="text-sm font-mono font-bold" style={{ color: 'var(--text-main)' }}>
+            Full JSON Payload
+          </span>
+        </div>
         <div className="flex items-center gap-3">
           <CopyButton text={text} label="Copy All" />
-          <button onClick={onClose} className="text-dim hover:text-text p-1.5 rounded-lg hover:bg-subtle transition-colors">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl border transition-all"
+            style={{
+              color: 'var(--text-dim)',
+              borderColor: 'var(--border-color)',
+              backgroundColor: 'transparent',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = 'var(--text-main)'
+              e.currentTarget.style.borderColor = 'var(--accent)'
+              e.currentTarget.style.backgroundColor = 'rgba(59,130,246,0.06)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = 'var(--text-dim)'
+              e.currentTarget.style.borderColor = 'var(--border-color)'
+              e.currentTarget.style.backgroundColor = 'transparent'
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
+            Close
           </button>
         </div>
       </div>
+      {/* Scrollable JSON content */}
       <div className="flex-1 overflow-auto p-6">
-        <pre className="font-mono text-xs text-text/80 leading-relaxed whitespace-pre-wrap">{text}</pre>
+        <pre
+          className="font-mono text-xs leading-relaxed whitespace-pre-wrap"
+          style={{ color: 'var(--text-main)', opacity: 0.85 }}
+        >
+          {text}
+        </pre>
       </div>
     </div>
   )
@@ -191,8 +229,8 @@ export default function SuccessCard({ result, onDismiss }) {
         </div>
 
         {/* ── Code Snippets ── */}
-        <div className="card overflow-hidden border border-white/5 bg-[#0b111a]/50 mb-4">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 bg-white/[0.02]">
+        <div className="card overflow-hidden mb-4" style={{ backgroundColor: 'var(--panel-color)', border: '1px solid var(--border-color)' }}>
+          <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: '1px solid var(--border-color)', backgroundColor: 'var(--surface-color, var(--panel-color))' }}>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-widest text-accent">Node.js Snippet</span>
             </div>
@@ -210,7 +248,7 @@ export default function SuccessCard({ result, onDismiss }) {
             <div className="absolute top-4 right-4 z-10">
               <CopyButton text={activeSnippet} />
             </div>
-            <div className="p-6 pt-5 overflow-x-auto bg-[#080a0f]">
+            <div className="p-6 pt-5 overflow-x-auto" style={{ backgroundColor: 'var(--bg-color)' }}>
               <TokenisedCode code={activeSnippet} />
             </div>
           </div>

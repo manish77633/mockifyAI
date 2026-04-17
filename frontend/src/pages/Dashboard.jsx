@@ -1,23 +1,34 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import AIModeForm from '../components/AIModeForm'
 import ManualModeForm from '../components/ManualModeForm'
 import SuccessCard from '../components/SuccessCard'
+import RecentEndpoints from '../components/RecentEndpoints'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Code2, Zap } from 'lucide-react'
 
 const TABS = [
-  { id: 'ai', label: 'AI Generator', icon: <Sparkles size={18} />, desc: 'Describe your schema, AI generates it.' },
-  { id: 'manual', label: 'Manual JSON', icon: <Code2 size={18} />, desc: 'Paste your JSON and host it instantly.' },
+  { id: 'ai',     label: 'AI Generator', icon: <Sparkles size={18} />, desc: 'Describe your schema, AI generates it.' },
+  { id: 'manual', label: 'Manual JSON',  icon: <Code2 size={18} />,    desc: 'Paste your JSON and host it instantly.' },
 ]
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState('ai')
+  const [activeTab,     setActiveTab]     = useState('ai')
   const [successResult, setSuccessResult] = useState(null)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
 
-  const handleSuccess = (result) => {
-    setSuccessResult(result)
+  const handleSuccess = useCallback((result) => {
+    const enriched = { ...result, mode: 'ai' }
+    setSuccessResult(enriched)
+    setRefreshTrigger(prev => prev + 1)
     setTimeout(() => document.getElementById('success-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
-  }
+  }, [])
+
+  const handleManualSuccess = useCallback((result) => {
+    const enriched = { ...result, mode: 'manual' }
+    setSuccessResult(enriched)
+    setRefreshTrigger(prev => prev + 1)
+    setTimeout(() => document.getElementById('success-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+  }, [])
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
@@ -73,7 +84,7 @@ export default function Dashboard() {
           </div>
           <div>
             <h3 className="font-display font-black text-sm text-text uppercase tracking-[0.2em] mb-1">Configuration</h3>
-            <p className="text-xs text-dim font-bold">{activeTab === 'ai' ? 'Deterministic Llama 3.1 Synthesis' : 'Stateless Manual Schema Injection'}</p>
+            <p className="text-xs text-dim font-bold">{activeTab === 'ai' ? 'Deterministic Gemini 2.5 Synthesis' : 'Stateless Manual Schema Injection'}</p>
           </div>
         </div>
 
@@ -85,7 +96,10 @@ export default function Dashboard() {
             exit={{ opacity: 0, scale: 0.98, y: -10 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           >
-            {activeTab === 'ai' ? <AIModeForm onSuccess={handleSuccess} /> : <ManualModeForm onSuccess={handleSuccess} />}
+            {activeTab === 'ai'
+              ? <AIModeForm onSuccess={handleSuccess} />
+              : <ManualModeForm onSuccess={handleManualSuccess} />
+            }
           </motion.div>
         </AnimatePresence>
       </div>
@@ -100,6 +114,9 @@ export default function Dashboard() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* ── Persistent History Section ── */}
+      <RecentEndpoints refreshTrigger={refreshTrigger} />
 
       {/* Metrics Row */}
       <div className="mt-20 pt-12 border-t border-border/10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">

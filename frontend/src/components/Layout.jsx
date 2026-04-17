@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import DocsModal from './DocsModal'
-import { LayoutDashboard, Compass, Activity, Terminal, LogOut, Sun, Moon, FileJson, Zap, User, ChevronDown } from 'lucide-react'
+import { LayoutDashboard, Compass, Activity, Terminal, LogOut, Sun, Moon, FileJson, Zap, User, ChevronDown, LogIn, UserPlus } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ThreeBackground from './ThreeBackground'
 
@@ -22,10 +22,10 @@ export default function Layout({ children }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={14} /> },
-    { name: 'Analytics', path: '/analytics', icon: <Activity size={14} /> },
-    { name: 'Templates', path: '/templates', icon: <Compass size={14} /> },
-    { name: 'Playground', path: '/playground', icon: <Terminal size={14} /> },
+    { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard size={16} /> },
+    { name: 'Analytics', path: '/analytics', icon: <Activity size={16} /> },
+    { name: 'Templates', path: '/templates', icon: <Compass size={16} /> },
+    { name: 'Playground', path: '/playground', icon: <Terminal size={16} /> },
   ]
 
   return (
@@ -52,8 +52,8 @@ export default function Layout({ children }) {
           {navItems.map((item) => {
             const isActive = location.pathname.startsWith(item.path)
             return (
-              <Link key={item.name} to={item.path} className="relative px-2 md:px-3 py-1.5 rounded-full transition-all group shrink-0">
-                <span className={`relative z-10 font-display font-bold text-[10px] uppercase tracking-widest transition-colors flex items-center gap-2 ${isActive ? 'text-accent' : 'text-muted hover:text-text'
+              <Link key={item.name} to={item.path} className="relative px-3 md:px-4 py-2 rounded-full transition-all group shrink-0">
+                <span className={`relative z-10 font-display font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 ${isActive ? 'text-accent' : 'text-muted hover:text-text'
                   }`}>
                   <span className="md:hidden">{item.icon}</span>
                   <span className="hidden md:inline">{item.name}</span>
@@ -72,12 +72,13 @@ export default function Layout({ children }) {
 
         <div className="h-6 w-[1px] bg-border/50 mx-1 md:mx-4" />
 
-        <div className="flex items-center gap-3 px-2">
-          <button onClick={toggleTheme} className="p-2 rounded-full text-muted hover:text-text hover:bg-white/5 transition-all">
-            {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+        <div className="flex items-center gap-2 px-2">
+          <button onClick={toggleTheme} className="p-2.5 rounded-full text-muted hover:text-text hover:bg-white/10 transition-all">
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          {user && (
+          {user ? (
+            // ── Logged-in: Profile Dropdown ──
             <div className="relative">
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -116,6 +117,22 @@ export default function Layout({ children }) {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+          ) : (
+            // ── Guest: Login + Sign Up buttons ──
+            <div className="flex items-center gap-2">
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-muted hover:text-text border border-border hover:border-accent/40 transition-all"
+              >
+                <LogIn size={14} /> Login
+              </Link>
+              <Link
+                to="/signup"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-accent text-white hover:brightness-110 transition-all shadow-sm"
+              >
+                <UserPlus size={14} /> Sign Up
+              </Link>
             </div>
           )}
         </div>

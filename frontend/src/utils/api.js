@@ -38,8 +38,11 @@ export const generateAIMock = ({ prompt, endpointName }) =>
 export const createManualMock = ({ endpointName, payload }) =>
   api.post('/endpoints/manual', { endpointName, payload })
 
-export const listEndpoints = (page = 1) =>
-  api.get(`/endpoints?page=${page}&limit=20`)
+export const listEndpoints = (page = 1, limit = 50) =>
+  api.get(`/endpoints?page=${page}&limit=${limit}`)
+
+export const getEndpointDetail = (id) =>
+  api.get(`/endpoints/${id}/detail`)
 
 export const deleteEndpoint = (id) =>
   api.delete(`/endpoints/${id}`)
