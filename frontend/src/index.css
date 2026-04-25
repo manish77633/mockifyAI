@@ -14,7 +14,7 @@
   --editor-bg: rgba(0, 0, 0, 0.45);
   --void: #000000;
   --subtle: rgba(255, 255, 255, 0.08);
-  --acid: #10B981;
+  --acid: #6366F1; /* Indigo - works better in both modes */
   --danger: #EF4444;
 }
 
@@ -31,7 +31,7 @@
   --editor-bg: #F8FAFC;
   --void: #FFFFFF;
   --subtle: #F1F5F9;
-  --acid: #059669;
+  --acid: #4F46E5; /* Indigo - works better in both modes */
   --danger: #DC2626;
 }
 

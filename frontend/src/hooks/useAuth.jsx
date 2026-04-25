@@ -99,6 +99,26 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const googleLogin = async (idToken) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        setToken(data.token);
+        return { success: true };
+      }
+      return { success: false, message: data.message };
+    } catch (err) {
+      return { success: false, message: 'Server connection failed.' };
+    }
+  };
+
   const value = useMemo(() => ({
     user,
     token,
@@ -106,6 +126,7 @@ export function AuthProvider({ children }) {
     isAuthenticated: !!user,
     login,
     signup,
+    googleLogin,
     logout
   }), [user, token, loading, logout]);
 

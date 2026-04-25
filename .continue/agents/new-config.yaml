@@ -1,0 +1,5 @@
+models:
+  - title: Gemini Flash
+    provider: gemini
+    model: gemini-2.5-flash
+    apiKey: AIzaSyA9ltULt-52J_dx1oaZKcvhlG0RfRZg3t4

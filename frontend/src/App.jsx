@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './hooks/useAuth'
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import LandingPage from './pages/LandingPage'
 import Dashboard from './pages/Dashboard'
 import AnalyticsDashboard from './pages/AnalyticsDashboard'
@@ -13,8 +14,9 @@ import Layout from './components/Layout'
 // All pages are fully public — auth gate is triggered only on endpoint creation
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || 'demo_client_id'}>
+      <AuthProvider>
+        <BrowserRouter>
         <Layout>
           <Routes>
             <Route path="/"           element={<LandingPage />} />
@@ -28,7 +30,8 @@ export default function App() {
             <Route path="*"           element={<LandingPage />} />
           </Routes>
         </Layout>
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   )
 }
