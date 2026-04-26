@@ -16,6 +16,8 @@ const userSchema = new mongoose.Schema(
     googleId:      { type: String, unique: true, sparse: true },
     password:      { type: String, required: false, minlength: 8, select: false },
     isPro:         { type: Boolean, default: false },
+    isAdmin:       { type: Boolean, default: false },
+    isBanned:      { type: Boolean, default: false },
     endpointCount: { type: Number, default: 0 },
     refreshToken:  { type: String, select: false },
   },

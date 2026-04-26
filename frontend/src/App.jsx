@@ -9,6 +9,7 @@ import APIPlayground from './pages/APIPlayground'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Pricing from './pages/Pricing'
+import AdminDashboard from './pages/AdminDashboard'
 import Layout from './components/Layout'
 
 // All pages are fully public — auth gate is triggered only on endpoint creation
@@ -27,6 +28,7 @@ export default function App() {
             <Route path="/analytics"  element={<AnalyticsDashboard />} />
             <Route path="/templates"  element={<CommunityTemplates />} />
             <Route path="/playground" element={<APIPlayground />} />
+            <Route path="/admin"      element={<AdminDashboard />} />
             <Route path="*"           element={<LandingPage />} />
           </Routes>
         </Layout>

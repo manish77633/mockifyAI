@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useTheme } from '../hooks/useTheme'
 import DocsModal from './DocsModal'
-import { LayoutDashboard, Compass, Activity, Terminal, LogOut, Sun, Moon, FileJson, Zap, User, ChevronDown, LogIn, UserPlus } from 'lucide-react'
+import { LayoutDashboard, Compass, Activity, Terminal, LogOut, Sun, Moon, FileJson, Zap, User, ChevronDown, LogIn, UserPlus, Settings } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ThreeBackground from './ThreeBackground'
 
@@ -109,6 +109,11 @@ export default function Layout({ children }) {
                       <Link to="/pricing" onClick={() => setIsProfileOpen(false)} className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs text-accent font-bold hover:bg-accent/5 rounded-xl transition-all">
                         <Zap size={16} /> Upgrade Plan
                       </Link>
+                      {user.isAdmin && (
+                        <Link to="/admin" onClick={() => setIsProfileOpen(false)} className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs text-sky-400 font-bold hover:bg-sky-400/5 rounded-xl transition-all">
+                          <Settings size={16} /> Admin Panel
+                        </Link>
+                      )}
                       <div className="h-[1px] bg-white/10 my-2 mx-2" />
                       <button onClick={logout} className="w-full flex items-center gap-3 px-3.5 py-2.5 text-xs text-slate-400 hover:text-red-400 hover:bg-red-400/5 rounded-xl transition-all">
                         <LogOut size={16} /> Sign Out

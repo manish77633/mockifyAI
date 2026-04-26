@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 
+
 const app = express();
 
 // ─── Health Check (Top level, skips logging) ──────────────────────────────────
@@ -39,9 +40,9 @@ app.use(express.urlencoded({ extended: true, limit: '32kb' }));
 
 // ─── Rate Limiters ────────────────────────────────────────────────────────────
 const mockFetchLimiter = rateLimit({
-  windowMs: 60 * 1000, 
+  windowMs: 60 * 1000,
   max: 60,
-  standardHeaders: true, 
+  standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
   message: { success: false, message: 'Rate limit exceeded. Max 60 requests/min per IP.' },
@@ -53,13 +54,14 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/payment', require('./routes/paymentRoutes'));
 app.use('/api/endpoints', require('./routes/apiRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/mock', mockFetchLimiter, require('./routes/mockRoutes'));
 
 // ─── Serve Frontend in Production ─────────────────────────────────────────────
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the frontend/dist folder
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  
+
   // Smart Catch-all Route
   app.get('*', (req, res, next) => {
     // If request is for an API route that wasn't matched above, 
@@ -93,9 +95,9 @@ app.use((err, _req, res, _next) => {
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) { 
-  console.error('FATAL: MONGO_URI not set.'); 
-  process.exit(1); 
+if (!MONGO_URI) {
+  console.error('FATAL: MONGO_URI not set.');
+  process.exit(1);
 }
 
 // Connect to MongoDB first, then start the server
@@ -105,14 +107,14 @@ mongoose
     console.log('✅  MongoDB connected');
     app.listen(PORT, () => console.log(`🚀  MockifyAI listening on :${PORT}`));
   })
-  .catch((err) => { 
-    console.error('FATAL:', err.message); 
-    process.exit(1); 
+  .catch((err) => {
+    console.error('FATAL:', err.message);
+    process.exit(1);
   });
 
-process.on('SIGTERM', async () => { 
-  await mongoose.connection.close(); 
-  process.exit(0); 
+process.on('SIGTERM', async () => {
+  await mongoose.connection.close();
+  process.exit(0);
 });
 
 module.exports = app;

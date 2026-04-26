@@ -50,4 +50,24 @@ export const deleteEndpoint = (id) =>
 export const updateEndpoint = (id, data) =>
   api.put(`/endpoints/${id}`, data)
 
+// ─── Admin API calls ──────────────────────────────────────────────────────────
+
+export const getAdminStats = () => api.get('/admin/stats')
+
+export const getAdminUsers = (page = 1, limit = 20, search = '', filter = '') => 
+  api.get(`/admin/users?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}&filter=${encodeURIComponent(filter)}`)
+
+export const banAdminUser = (userId) => api.put(`/admin/users/${userId}/ban`)
+
+export const toggleAdminRole = (userId) => api.put(`/admin/users/${userId}/role`)
+
+export const deleteAdminUser = (userId) => api.delete(`/admin/users/${userId}`)
+
+export const getAdminEndpoints = (page = 1, limit = 20) => 
+  api.get(`/admin/endpoints?page=${page}&limit=${limit}`)
+
+export const deleteAdminEndpoint = (id) => api.delete(`/admin/endpoints/${id}`)
+
+export const getAdminRevenue = () => api.get('/admin/revenue')
+
 export default api
