@@ -85,11 +85,13 @@ exports.googleLogin = async (req, res, next) => {
   try {
     const { idToken } = req.body;
 
+    console.log('CLIENT_ID:', process.env.GOOGLE_CLIENT_ID);
+    console.log('idToken received:', !!idToken);
+
     if (!idToken) {
       return res.status(400).json({ success: false, message: 'Google token is required.' });
     }
 
-    // Verify Google ID Token
     const ticket = await googleClient.verifyIdToken({
       idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -100,27 +102,20 @@ exports.googleLogin = async (req, res, next) => {
     const email = payload.email;
     const name = payload.name;
 
-    // Check if user already exists
     let user = await User.findOne({ email });
-
     if (user) {
-      // Existing user, update googleId if not present
       if (!user.googleId) {
         user.googleId = googleId;
         await user.save();
       }
     } else {
-      // Create new user
-      // Generate unique username from name
       let baseUsername = name.toLowerCase().replace(/[^a-z0-9_-]/g, '').substring(0, 25);
       let username = baseUsername;
       let counter = 1;
-
       while (await User.findOne({ username })) {
         username = `${baseUsername}${counter}`;
         counter++;
       }
-
       user = await User.create({
         username,
         email,
@@ -130,15 +125,13 @@ exports.googleLogin = async (req, res, next) => {
     }
 
     const token = generateToken(user);
-
     res.status(200).json({
       success: true,
       token,
       user: user.toSafeObject(),
     });
-
   } catch (err) {
-    console.error('Google Login Error:', err);
-    return res.status(401).json({ success: false, message: 'Invalid Google token.' });
+    console.error('Google Login Error FULL:', err.message); // FULL error
+    return res.status(401).json({ success: false, message: err.message }); // actual error bhejo
   }
 };
