@@ -25,12 +25,13 @@ const userSchema = new mongoose.Schema(
 userSchema.virtual('maxEndpoints').get(function () { return this.isPro ? 100 : 10; });
 
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password') || !this.password) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
 userSchema.methods.comparePassword = function (candidate) {
+  if (!this.password) return Promise.resolve(false);
   return bcrypt.compare(candidate, this.password);
 };
 
